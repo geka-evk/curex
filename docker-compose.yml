@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  curex-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+    restart: always
+#    command: npm run start:dev
+    ports:
+      - "127.0.0.1:3000:${HTTP_PORT}"
+    env_file: .env
+    volumes:
+      - .:/curex-app
+    depends_on:
+      - postgres
+    networks:
+      - curex-net
+
+  postgres:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - pgData:/var/lib/postgresql/data
+    networks:
+      - curex-net
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - curex-net
+
+networks:
+  curex-net:
+
+volumes:
+  pgData:
