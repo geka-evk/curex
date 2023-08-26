@@ -33,6 +33,12 @@ exchange-offices
     id = 2
     name = Exchanger 2
     country = UKR
+    exchanges
+      exchange
+        from = AUD
+        to = CAD
+        ask = 100
+        date = 2023-04-25 22:55:33
     rates
       rate
         from = AUD

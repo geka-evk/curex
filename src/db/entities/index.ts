@@ -8,21 +8,36 @@ import {
   JoinColumn,
 } from 'typeorm';
 
+export type Currencies = 'CAD' | 'AUD' | 'EUR' | 'UAH' | 'USD';
+
 abstract class CommonRateExchangeInfo {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ length: 3 })
   from: Currencies;
 
-  @Column()
+  @Column({ length: 3 })
   to: Currencies;
 
   @Column()
   date: Date;
 }
 
-export type Currencies = 'EUR' | 'USD' | 'UAH';
+@Entity()
+export class Country {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({
+    unique: true,
+    length: 3,
+  })
+  code: string;
+
+  @Column({ length: 50 })
+  name: string;
+}
 
 @Entity()
 export class ExchangeOffice {
@@ -32,9 +47,12 @@ export class ExchangeOffice {
   @Column({ length: 100 })
   name: string;
 
-  @ManyToOne(() => Country, (c) => c.code)
-  @JoinColumn({ referencedColumnName: 'code' })
-  country: Currencies;
+  @ManyToOne(() => Country, (c) => c.code, { nullable: false })
+  @JoinColumn({
+    name: 'country',
+    referencedColumnName: 'code',
+  })
+  country: Country;
 
   @OneToMany(() => Exchange, (exchange) => exchange.exchangeOffice, {
     cascade: true,
@@ -45,6 +63,7 @@ export class ExchangeOffice {
     cascade: true,
   })
   rates: Rate[];
+  // think, if we need createdAt/updateAd-fields
 }
 
 @Entity()
@@ -75,21 +94,4 @@ export class Rate extends CommonRateExchangeInfo {
   })
   @JoinColumn()
   exchangeOffice: ExchangeOffice;
-}
-
-@Entity()
-export class Country {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column({
-    unique: true,
-    length: 3,
-  })
-  code: Currencies;
-
-  @Column({ length: 50 })
-  name: string;
-
-  // think, if we need createdAt-field
 }

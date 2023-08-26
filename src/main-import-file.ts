@@ -6,7 +6,7 @@ import * as process from 'process';
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule);
   const dbImportService = app.get(DbImportService);
-  await dbImportService.importFileContentToDb();
+  await dbImportService.importFileFromDiskToDb();
   process.exit(0);
 }
 bootstrap();

@@ -20,5 +20,6 @@ export interface IDocument {
 }
 
 export interface IFileImporter {
+  makeJsonFromText: (content: string) => TJsonContent | null;
   importFromFile: (fileName?: string) => Promise<TJsonContent | null>;
 }

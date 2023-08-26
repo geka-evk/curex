@@ -5,9 +5,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: prod
+      target: dev
     restart: always
-#    command: npm run start:dev
+    command: npm run start:dev
     ports:
       - "127.0.0.1:3000:${HTTP_PORT}"
     env_file: .env

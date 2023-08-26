@@ -26,10 +26,19 @@ export class DbImportService {
     private readonly exchangeOfficeRepo: Repository<ExchangeOffice>,
   ) {}
 
-  async importFileContentToDb() {
-    const content: TJsonContent = await this.loadContentFromFile();
+  async importFileFromDiskToDb(fileName?: string) {
+    const content: TJsonContent = await this.loadContentFromFile(fileName);
+    return this.storeFileContentInDb(content);
+  }
+
+  async uploadFileToDb(file: string) {
+    const content = this.parseFileToJson(file);
+    return this.storeFileContentInDb(content);
+  }
+
+  private async storeFileContentInDb(content: TJsonContent) {
     if (!content) {
-      this.logger.warn(`Failed to load content from import file`);
+      this.logger.warn(`No content for storing in DB`);
       return {
         countries: [],
         offices: [],
@@ -40,7 +49,7 @@ export class DbImportService {
     const offices = await this.importExchangeOffices(
       content[exchangeOfficesField],
     );
-    this.logger.log('importFromFile is done');
+    this.logger.log('storeFileContentInDb is done');
 
     return {
       countries,
@@ -48,7 +57,9 @@ export class DbImportService {
     };
   }
 
-  async importCountries(countryList: TCountryList): Promise<Country[] | []> {
+  private async importCountries(
+    countryList: TCountryList,
+  ): Promise<Country[] | []> {
     const codes = countryList.map((c) => c.code);
     const dbData = await this.countryRepo.findBy({ code: In(codes) });
 
@@ -63,7 +74,7 @@ export class DbImportService {
     return this.countryRepo.save(countries);
   }
 
-  async importExchangeOffices(
+  private async importExchangeOffices(
     eoList: TExchangeOfficeList,
   ): Promise<ExchangeOffice[] | []> {
     const ids = eoList.map((eo) => Number(eo.id));
@@ -81,7 +92,13 @@ export class DbImportService {
   }
   // todo: move common logic of filtering existing entities to one place
 
-  async loadContentFromFile(fileName?: string): Promise<TJsonContent | null> {
+  private async loadContentFromFile(
+    fileName?: string,
+  ): Promise<TJsonContent | null> {
     return this.fileImporter.importFromFile(fileName);
+  }
+
+  private parseFileToJson(file: string): TJsonContent | null {
+    return this.fileImporter.makeJsonFromText(file);
   }
 }

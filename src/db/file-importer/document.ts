@@ -24,7 +24,7 @@ export class Document implements IDocument {
 
       const [indent] = line.match(/^\s*/);
       const level = indent.length / config.INDENT_LENGTH;
-      // todo: !!! think, what if wrong indent count (just skip the row?)
+      // todo: think, what if wrong indent count (just skip the row?)
 
       const isProp = line.includes(config.KEY_VALUE_DELIMITER);
 

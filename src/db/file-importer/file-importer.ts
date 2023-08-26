@@ -1,10 +1,10 @@
 import path from 'node:path';
 import { readFile } from 'node:fs/promises';
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 
 import { IFileImporter, IDocument, INode } from './interfaces';
 import { TJsonContent } from './types';
-import { Document } from './document';
+import { documentFactory } from './document-factory';
 import { INPUT_DIRECTORY, INPUT_FILE, KEY_VALUE_DELIMITER } from './config';
 
 @Injectable()
@@ -14,8 +14,17 @@ export class FileImporter implements IFileImporter {
 
   #logger = new Logger(FileImporter.name);
 
-  constructor() {
-    this.#doc = FileImporter.createDocument();
+  makeJsonFromText(content: string): TJsonContent | null {
+    try {
+      this.#doc = documentFactory();
+      this.#doc.processRawFile(content);
+      const json = this.#assemble();
+      this.#logger.log('json structure is ready to be stored in DB');
+      return json;
+    } catch (err) {
+      this.#logger.error(`error in makeJsonFromFile: ${err.message}`);
+      return null;
+    }
   }
 
   async importFromFile(
@@ -23,13 +32,11 @@ export class FileImporter implements IFileImporter {
   ): Promise<TJsonContent | null> {
     try {
       const content: string = await this.#readFileContent(fileName);
-      this.#doc.processRawFile(content);
-      const json = this.#assemble();
-
-      this.#logger.log('file is loaded');
-      return json;
+      return this.makeJsonFromText(content);
     } catch (err) {
       this.#logger.error(`error on file loading: ${err.message}`);
+      if (err.code === 'ENOENT')
+        throw new BadRequestException(`No file ${fileName}`);
       return null;
     }
   }
@@ -73,10 +80,5 @@ export class FileImporter implements IFileImporter {
   #readFileContent(fileName: string) {
     const filePath = path.resolve(INPUT_DIRECTORY, fileName);
     return readFile(filePath, 'utf-8');
-  }
-
-  static createDocument(): IDocument {
-    // todo: think, if it's better to pass to c-tor? Or use docFactory?
-    return new Document();
   }
 }
