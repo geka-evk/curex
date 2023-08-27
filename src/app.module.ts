@@ -6,7 +6,13 @@ import { pgDbConfig } from './config';
 import { DbModule } from './db/db.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { Country, Exchange, ExchangeOffice, Rate } from './db/entities';
+import {
+  Country,
+  Currency,
+  Exchange,
+  ExchangeOffice,
+  Rate,
+} from './db/entities';
 
 @Module({
   imports: [
@@ -17,7 +23,7 @@ import { Country, Exchange, ExchangeOffice, Rate } from './db/entities';
     }),
     TypeOrmModule.forRoot({
       ...pgDbConfig(),
-      entities: [Country, ExchangeOffice, Exchange, Rate],
+      entities: [Country, ExchangeOffice, Exchange, Rate, Currency],
     }),
   ],
   controllers: [AppController],

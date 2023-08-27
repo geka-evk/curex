@@ -11,6 +11,7 @@ import {
   countriesField,
   exchangeOfficesField,
 } from './file-importer/types';
+import { ImportResponseDto } from './io.dto';
 
 @Injectable()
 export class DbImportService {
@@ -36,7 +37,9 @@ export class DbImportService {
     return this.storeFileContentInDb(content);
   }
 
-  private async storeFileContentInDb(content: TJsonContent) {
+  private async storeFileContentInDb(
+    content: TJsonContent,
+  ): Promise<ImportResponseDto> {
     if (!content) {
       this.logger.warn(`No content for storing in DB`);
       return {

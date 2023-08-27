@@ -29,6 +29,7 @@ services:
       - "${DB_PORT}:5432"
     volumes:
       - pgData:/var/lib/postgresql/data
+      - ./src/config/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - curex-net
 

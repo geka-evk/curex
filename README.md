@@ -37,6 +37,9 @@ DB_NAME=curex-db
 DB_SYNCHRONIZE=true
 ```
 
+## API docs (Swagger)
+  Url to try existing endpoints: `localhost:3000/api-docs`
+
 
 ## Answers
 
@@ -69,6 +72,5 @@ DB_SYNCHRONIZE=true
    - `POST localhost:3000/db/import-file`, which accepts fileContent as _form-data_ 
 
      https://i.imgur.com/yKvgJcy.png
-
 
 
